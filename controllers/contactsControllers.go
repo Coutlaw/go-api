@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"go-contacts/models"
-	u "go-contacts/utils"
+	"go-api/models"
+	u "go-api/utils"
 	"net/http"
 )
 
