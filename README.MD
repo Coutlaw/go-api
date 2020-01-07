@@ -1,8 +1,8 @@
-# go-api
+# **ROLOXEX, a Golang API**
 
-My first experiamental golang API that allows users to store contacts. Users are authenticated with a JWT on their requests. I used `gorilla/mux` for routing, and Postgresql running in Google Cloud Platform for a db. There is a `.env` file for managing connection details. The project was rebuilt by me from this [Medium Article](https://medium.com/@adigunhammedolalekan/build-and-deploy-a-secure-rest-api-with-go-postgresql-jwt-and-gorm-6fadf3da505b) to teach myself the basics of a golang API
+My first experimental golang API that allows users to store contacts like a rolodex. Users are authenticated with a JWT on their requests. I used `gorilla/mux` for routing, and Postgresql running in Google Cloud Platform for a db. There is a `.env` file for managing connection details. The project was rebuilt by me from this [Medium Article](https://medium.com/@adigunhammedolalekan/build-and-deploy-a-secure-rest-api-with-go-postgresql-jwt-and-gorm-6fadf3da505b) to teach myself the basics of a golang API
 
-# Organization
+# **ORGANIZATION**
 The project hierarchy:
 ```
 go-api
@@ -29,7 +29,7 @@ go-api
 `app` contains our auth functions and error handling.
 `controllers` provides all the controller layer operations. `models` provide model shapes, content/request validation and operational logic with the DB. `utils` provides json serialization for responses and message handling functions.
 
-# Enviornment
+# **ENVIORNMENT**
 Not included is a `.env` file that will need to be formatted like so :
 ```
 db_name = gocontacts
@@ -43,7 +43,7 @@ database_url = postgres-url
 ```
 The content in this file will provide all DB connection details for the application to run.
 
-# Running
+# **RUNNING**
 
 Note: dependencies require go version `go1.12.0` or greater
 Required dependencies to install with `go get {dependency}
@@ -71,11 +71,12 @@ Listening on port: 8000
 	
 
 
-# Routes
-Creating a user:
-`api/user/new`
+# **ROUTES**
 
-Notes: The user will be provided a JWT in return to use for future requested based on the info they provided, the user's email must be unique in the DB and passwords > 6 characters.
+## `api/user/new`
+------
+### POST
+The user will be provided a JWT in return to use for future requested based on the info they provided, the user's email must be unique in the DB and passwords > 6 characters.
 
 Request:
 ```
@@ -110,12 +111,233 @@ Response:
   "status": false
 }
 ```
+---
+## `api/user/login`
+---
+### POST
+
+Notes: The user will be provided a JWT in return to use for future requested based on the info they provided, the user's email and password must match what they used when they created their account
+
+Request:
+```
+curl --request POST \
+  --url http://localhost:8000/api/users/login \
+  --header 'content-type: application/json' \
+  --data '{
+	"email" : "test@testytest.com",
+	"password" : "PaSsWoRd"
+}'
+```
+Response:
+```
+// Success
+{
+  "account": {
+    "ID": 1,
+    "CreatedAt": "2020-01-04T15:56:29.252043Z",
+    "UpdatedAt": "2020-01-04T15:56:29.252043Z",
+    "DeletedAt": null,
+    "email": "test@testytest.com",
+    "password": "",
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjF9.qq_02tATMUBkVUjI0cMplK8iN9Lv0ce_kZGtE3BuOtw"
+  },
+  "message": "Logged In",
+  "success": true
+}
+
+// Error
+{
+  "message": "Invalid login credentials. Please try again",
+  "success": false
+}
+```
+---
+
+## `api/user/contacts`
+---
+
+### POST
+Creates a new contact for a user. The user will have to attache an authentication header with a bearer token from their JWT.
+
+Request:
+```
+curl --request POST \
+  --url http://localhost:8000/api/users/contacts \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjF9.qq_02tATMUBkVUjI0cMplK8iN9Lv0ce_kZGtE3BuOtw' \
+  --header 'content-type: application/json' \
+  --data '{
+	"name" : "contact num4boi",
+	"phone" : "8033332227"
+}'
+```
+Response:
+```
+// Success
+{
+  "contact": {
+    "ID": 5,
+    "CreatedAt": "2020-01-06T23:43:47.655196-05:00",
+    "UpdatedAt": "2020-01-06T23:43:47.655196-05:00",
+    "DeletedAt": null,
+    "name": "contact num4boi",
+    "phone": "8033332227",
+    "user_id": 1
+  },
+  "message": "success",
+  "success": true
+}
+
+// Error
+{
+  "message": "Phone number should be on the payload",
+  "success": false
+}
+```
+
+### GET
+Gets all contacts for a user. The user will have to attache an authentication header with a bearer token from their JWT.
+
+Request:
+```
+curl --request GET \
+  --url http://localhost:8000/api/users/contacts \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjF9.qq_02tATMUBkVUjI0cMplK8iN9Lv0ce_kZGtE3BuOtw'
+```
+Response:
+```
+// Success
+{
+  "data": [
+    {
+      "ID": 1,
+      "CreatedAt": "2020-01-07T02:14:51.863213Z",
+      "UpdatedAt": "2020-01-07T02:14:51.863213Z",
+      "DeletedAt": null,
+      "name": "contact name",
+      "phone": "8033332222",
+      "user_id": 1
+    },
+    {
+      "ID": 2,
+      "CreatedAt": "2020-01-07T02:47:21.328672Z",
+      "UpdatedAt": "2020-01-07T02:47:21.328672Z",
+      "DeletedAt": null,
+      "name": "contact name",
+      "phone": "8033332222",
+      "user_id": 1
+    },
+    {
+      "ID": 3,
+      "CreatedAt": "2020-01-07T03:37:17.741761Z",
+      "UpdatedAt": "2020-01-07T03:37:17.741761Z",
+      "DeletedAt": null,
+      "name": "contact name",
+      "phone": "8033332222",
+      "user_id": 1
+    }
+  ],
+  "message": "success",
+  "success": true
+}
+
+// Error
+{
+  "message": "user not valid",
+  "success": false
+}
+```
+
+### DELETE
+DELETES a single contact for a user by using the contact ID. The user will have to attache an authentication header with a bearer token from their JWT.
+
+Request:
+```
+curl --request DELETE \
+  --url http://localhost:8000/api/users/contacts/2 \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjF9.qq_02tATMUBkVUjI0cMplK8iN9Lv0ce_kZGtE3BuOtw'
+```
+Response:
+```
+// Success
+{
+  "message": "success",
+  "success": true
+}
+
+// Error
+{
+  "message": "user not valid",
+  "success": false
+}
+```
+
+---
+
+## `api/user/contacts/{ID}`
+---
+
+### GET
+Gets a single contact for a user by using the contact ID. The user will have to attache an authentication header with a bearer token from their JWT.
+
+Request:
+```
+curl --request GET \
+  --url http://localhost:8000/api/users/contacts/2 \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjF9.qq_02tATMUBkVUjI0cMplK8iN9Lv0ce_kZGtE3BuOtw'
+```
+Response:
+```
+// Success
+{
+  "data": {
+    "ID": 2,
+    "CreatedAt": "2020-01-07T02:47:21.328672Z",
+    "UpdatedAt": "2020-01-07T02:47:21.328672Z",
+    "DeletedAt": null,
+    "name": "contact name",
+    "phone": "8033332222",
+    "user_id": 1
+  },
+  "message": "success",
+  "success": true
+}
+
+// Error
+{
+  "message": "user not valid",
+  "success": false
+}
+```
+
+### DELETE
+DELETES a single contact for a user by using the contact ID. The user will have to attache an authentication header with a bearer token from their JWT.
+
+Request:
+```
+curl --request DELETE \
+  --url http://localhost:8000/api/users/contacts/2 \
+  --header 'authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJVc2VySWQiOjF9.qq_02tATMUBkVUjI0cMplK8iN9Lv0ce_kZGtE3BuOtw'
+```
+Response:
+```
+// Success
+{
+  "message": "success",
+  "success": true
+}
+
+// Error
+{
+  "message": "user not valid",
+  "success": false
+}
+```
 
 # Logging
-More content to come
+More content to come as I add better system logging
 
 # Portability
-App will be dockerised in the near future, more content to follow
+App will be docker-ised in the near future, more content to follow
 
 ## License
 
