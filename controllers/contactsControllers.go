@@ -16,12 +16,16 @@ var CreateContact = func(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(contact)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error while decoding request body"))
+		http.Error(w, "Error while decoding request body, your JSON is probably malformed", http.StatusBadRequest)
 		return
 	}
 
 	contact.UserId = user
 	resp := contact.Create()
+	if resp["success"].(bool) != true {
+		http.Error(w, resp["message"].(string), http.StatusBadRequest)
+		return
+	}
 	u.Respond(w, resp)
 }
 
@@ -43,7 +47,8 @@ var GetContactById = func(w http.ResponseWriter, r *http.Request) {
 	// Convert inline param to uint
 	contactId, err := strconv.ParseUint(contactIdParam, 10, 32)
 	if err != nil {
-		u.Respond(w, u.Message(false, "Error with contactId param, could not be converted to uint"))
+		http.Error(w, "Error with contactId param, could not be converted to uint", http.StatusBadRequest)
+		return
 	}
 
 	// pull User Id from context

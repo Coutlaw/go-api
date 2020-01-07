@@ -18,28 +18,28 @@ type Contact struct {
 
 returns message and true if the requirement is met
 */
-func (contact *Contact) Validate() (map[string]interface{}, bool) {
+func (contact *Contact) Validate() (string, bool) {
 
 	if contact.Name == "" {
-		return u.Message(false, "Contact name should be on the payload"), false
+		return "Contact name should be on the payload", false
 	}
 
 	if contact.Phone == "" {
-		return u.Message(false, "Phone number should be on the payload"), false
+		return "Phone number should be on the payload", false
 	}
 
 	if contact.UserId <= 0 {
-		return u.Message(false, "User is not recognized"), false
+		return "User is not recognized", false
 	}
 
 	//All the required parameters are present
-	return u.Message(true, "success"), true
+	return "success", true
 }
 
 func (contact *Contact) Create() map[string]interface{} {
 
 	if resp, ok := contact.Validate(); !ok {
-		return resp
+		return u.Message(false, resp)
 	}
 
 	GetDB().Create(contact)
