@@ -27,8 +27,14 @@ func main() {
 	// Get all contacts for a user
 	router.HandleFunc("/api/users/contacts", controllers.GetContacts).Methods("GET")
 
+	// Delete all contacts for a user
+	router.HandleFunc("/api/users/contacts", controllers.DeleteContacts).Methods("DELETE")
+
 	// Get a contact by ID that belongs to a User
 	router.HandleFunc("/api/users/contacts/{contactId}", controllers.GetContactById).Methods("GET")
+
+	// Delete a contact by ID that belongs to a User
+	router.HandleFunc("/api/users/contacts/{contactId}", controllers.DeleteContactById).Methods("DELETE")
 
 
 	router.Use(app.JwtAuthentication) //attach JWT auth middleware

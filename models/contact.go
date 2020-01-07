@@ -59,6 +59,26 @@ func GetContact(contactId uint, userId uint) *Contact {
 	return contact
 }
 
+func DeleteContact(contactId uint, userId uint) *Contact {
+
+	contact := &Contact{}
+	err := GetDB().Table("contacts").Where("user_id = ?", userId).Where("id = ?", contactId).Delete(contact).Error
+	if err != nil {
+		return nil
+	}
+	return contact
+}
+
+func DeleteContacts(userId uint) *Contact {
+
+	contact := &Contact{}
+	err := GetDB().Table("contacts").Where("user_id = ?", userId).Delete(contact).Error
+	if err != nil {
+		return nil
+	}
+	return contact
+}
+
 func GetContacts(userId uint) []*Contact {
 
 	contacts := make([]*Contact, 0)

@@ -31,8 +31,8 @@ var CreateContact = func(w http.ResponseWriter, r *http.Request) {
 
 var GetContacts = func(w http.ResponseWriter, r *http.Request) {
 
-	id := r.Context().Value("user").(uint)
-	data := models.GetContacts(id)
+	userId := r.Context().Value("user").(uint)
+	data := models.GetContacts(userId)
 	resp := u.Message(true, "success")
 	resp["data"] = data
 	u.Respond(w, resp)
@@ -57,5 +57,34 @@ var GetContactById = func(w http.ResponseWriter, r *http.Request) {
 	data := models.GetContact(uint(contactId), userId)
 	resp := u.Message(true, "success")
 	resp["data"] = data
+	u.Respond(w, resp)
+}
+
+var DeleteContactById = func(w http.ResponseWriter, r *http.Request) {
+
+	// Fetch the inline params
+	vars := mux.Vars(r)
+	contactIdParam := vars["contactId"]
+
+	// Convert inline param to uint
+	contactId, err := strconv.ParseUint(contactIdParam, 10, 32)
+	if err != nil {
+		http.Error(w, "Error with contactId param, could not be converted to uint", http.StatusBadRequest)
+		return
+	}
+
+	// pull User Id from context
+	userId := r.Context().Value("user").(uint)
+
+	_ = models.DeleteContact(uint(contactId), userId)
+	resp := u.Message(true, "success")
+	u.Respond(w, resp)
+}
+
+var DeleteContacts = func(w http.ResponseWriter, r *http.Request) {
+
+	userId := r.Context().Value("user").(uint)
+	_ = models.DeleteContacts(userId)
+	resp := u.Message(true, "success")
 	u.Respond(w, resp)
 }
