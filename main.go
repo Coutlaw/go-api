@@ -13,10 +13,23 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/api/user/new", controllers.CreateAccount).Methods("POST")
-	router.HandleFunc("/api/user/login", controllers.Authenticate).Methods("POST")
-	router.HandleFunc("/api/contacts/new", controllers.CreateContact).Methods("POST")
-	router.HandleFunc("/api/me/contacts", controllers.GetContactsFor).Methods("GET") //  user/2/contacts
+	// ROUTES
+
+	// Create a user (gets a jwt)
+	router.HandleFunc("/api/users/new", controllers.CreateAccount).Methods("POST")
+
+	// Get a new JWT if users is expired
+	router.HandleFunc("/api/users/login", controllers.Authenticate).Methods("POST")
+
+	// Create contacts for a user
+	router.HandleFunc("/api/users/contacts", controllers.CreateContact).Methods("POST")
+
+	// Get all contacts for a user
+	router.HandleFunc("/api/users/contacts", controllers.GetContacts).Methods("GET")
+
+	// Get a contact by ID that belongs to a User
+	router.HandleFunc("/api/users/contacts/{contactId}", controllers.GetContactById).Methods("GET")
+
 
 	router.Use(app.JwtAuthentication) //attach JWT auth middleware
 
