@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"go-api/models"
-	u "go-api/utils"
 	"net/http"
 	"os"
 	"strings"
@@ -27,23 +26,20 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 			}
 		}
 
-		response := make(map[string]interface{})
-		tokenHeader := r.Header.Get("Authorization") //Grab the token from the header
+		// Grab the token from the header
+		tokenHeader := r.Header.Get("Authorization")
 
-		if tokenHeader == "" { //Token is missing, returns with error code 403 Unauthorized
-			response = u.Message(false, "Missing auth token")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+		if tokenHeader == "" {
+			// Token is missing, return error code 403 Unauthorized
+			http.Error(w, "Missing auth token", http.StatusForbidden)
 			return
 		}
 
-		splitted := strings.Split(tokenHeader, " ") //The token normally comes in format `Bearer {token-body}`, we check if the retrieved token matched this requirement
+		// The token normally comes in format `Bearer {token-body}`
+		// we check if the retrieved token matched this requirement
+		splitted := strings.Split(tokenHeader, " ")
 		if len(splitted) != 2 {
-			response = u.Message(false, "Invalid/Malformed auth token")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			http.Error(w, "Invalid/Malformed auth token, insure it comes in as Bearer {token-body}", http.StatusForbidden)
 			return
 		}
 
@@ -57,24 +53,19 @@ var JwtAuthentication = func(next http.Handler) http.Handler {
 
 		//Malformed token, returns with http code 403 as usual
 		if err != nil {
-			response = u.Message(false, "Malformed authentication token")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			http.Error(w, "Malformed authentication token, unable to correctly parse token", http.StatusForbidden)
 			return
 		}
 
 		//Token is invalid, maybe not signed on this server
 		if !token.Valid {
-			response = u.Message(false, "Token is not valid.")
-			w.WriteHeader(http.StatusForbidden)
-			w.Header().Add("Content-Type", "application/json")
-			u.Respond(w, response)
+			http.Error(w, "Invalid Token, maybe not signed on this server", http.StatusForbidden)
 			return
 		}
 
 		//Everything went well, proceed with the request and set the caller to the user retrieved from the parsed token
-		fmt.Sprintf("User %", tk.UserId) //Useful for monitoring
+		// Log the user
+		fmt.Println(fmt.Sprintf("UserId: %v authenticated successfully", tk.UserId))
 		ctx := context.WithValue(r.Context(), "user", tk.UserId)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r) //proceed in the middleware chain!
