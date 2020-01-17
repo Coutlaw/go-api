@@ -49,13 +49,13 @@ PGADMIN_DEFAULT_EMAIL=live@admin.com
 PGADMIN_DEFAULT_PASSWORD=password
 
 # info to point at the sql running in docker
-TEST_DB_HOST=fullstack-postgres                 # should match the docker image name
+TEST_DB_HOST=fullstack-postgres
 # TEST_DB_HOST=127.0.0.1                        # when running the app without docker 
 TEST_DB_DRIVER=postgres
 TEST_API_SECRET=someSecretForJWT                # can be whatever your want
 TEST_DB_USER=cass
 TEST_DB_PASSWORD=password
-TEST_DB_NAME=fullstack_api_test                 # the database that you are going to create in docker
+TEST_DB_NAME=fullstack_api_test
 TEST_DB_PORT=5432
 ```
 The content in this file will provide all DB connection details for the application to run. You will need to update the properties in base.go to tell it which set of variables you want to use for postgresql, by default I have pointed it at the sql that will be running in docker.
