@@ -7,6 +7,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"os"
 	"strings"
+	"time"
 )
 
 /*
@@ -67,7 +68,11 @@ func (account *Account) Create() map[string]interface{} {
 	}
 
 	//Create new JWT token for the newly registered account
-	tk := &Token{UserId: account.ID}
+	expirationTime := time.Now().Add(15 * time.Minute)
+	tk := &Token{UserId: account.ID, StandardClaims: jwt.StandardClaims{
+		// In JWT, the expiry time is expressed as unix milliseconds
+		ExpiresAt: expirationTime.Unix(),
+	},}
 	token := jwt.NewWithClaims(jwt.GetSigningMethod("HS256"), tk)
 	tokenString, _ := token.SignedString([]byte(os.Getenv("token_password")))
 	account.Token = tokenString

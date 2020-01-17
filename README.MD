@@ -21,6 +21,8 @@ go-api
 ├── go.mod
 ├── go.sum
 ├── main.go
+├── Dockerfile
+├── docker-compose.yml
 ├── LICENSE.md
 ├── README.MD
 | 
@@ -32,6 +34,7 @@ go-api
 # **ENVIORNMENT**
 Not included is a `.env` file that will need to be formatted like so :
 ```
+# info to point at a remote sql server
 db_name = gocontacts
 db_pass = pAsSwOrD
 db_user = postgres-user
@@ -40,10 +43,47 @@ db_host = localhost
 db_port = 5432
 token_password = jwtPassword
 database_url = postgres-url
-```
-The content in this file will provide all DB connection details for the application to run.
 
-# **RUNNING**
+# Used by pgadmin service 
+PGADMIN_DEFAULT_EMAIL=live@admin.com
+PGADMIN_DEFAULT_PASSWORD=password
+
+# info to point at the sql running in docker
+TEST_DB_HOST=fullstack-postgres                 # should match the docker image name
+# TEST_DB_HOST=127.0.0.1                        # when running the app without docker 
+TEST_DB_DRIVER=postgres
+TEST_API_SECRET=someSecretForJWT                # can be whatever your want
+TEST_DB_USER=cass
+TEST_DB_PASSWORD=password
+TEST_DB_NAME=fullstack_api_test                 # the database that you are going to create in docker
+TEST_DB_PORT=5432
+```
+The content in this file will provide all DB connection details for the application to run. You will need to update the properties in base.go to tell it which set of variables you want to use for postgresql, by default I have pointed it at the sql that will be running in docker.
+
+# **RUNNING IN DOCKER**
+Build the docker container from compose file and run the application with its own Postgresql image
+```
+docker-compose up
+```
+This will start the application, and you should see that it created all the required tables for the app in postgresql. Sometimes it can fail to connect if it is your first build, simply stop the container and re-run the compose up command. you can add `-d` flag to the end of the up command if you want it to silence all the logs.
+
+To stop the container
+```
+docker-compose down
+```
+
+To destroy the images when you stop the container
+```
+docker-compose down --rmi all
+```
+
+To remove the Postgresql volume and wipe the DB
+```
+docker volume ls          # list all the volumes
+docker volume rm {project-name}_database_postgre
+```
+
+# **RUNNING WITHOUT DOCKER**
 
 Note: dependencies require go version `go1.12.0` or greater
 Required dependencies to install with `go get {dependency}
@@ -336,8 +376,6 @@ Response:
 # Logging
 More content to come as I add better system logging
 
-# Portability
-App will be docker-ised in the near future, more content to follow
 
 ## License
 
