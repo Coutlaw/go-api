@@ -1,6 +1,6 @@
-# **ROLODEX, a Golang API**
+# **ROLODEX, an API in Go**
 
-My first experimental golang API that allows users to store contacts like a rolodex. Users are authenticated with a JWT on their requests. I used `gorilla/mux` for routing, and Postgresql running in Google Cloud Platform for a db. There is a `.env` file for managing connection details. The project was built to teach myself the basics of a golang API
+My first experimental gol API that allows users to store contacts like a rolodex. Users are authenticated with a JWT on their requests. I used `gorilla/mux` for routing, and Postgresql running in Google Cloud Platform for a db. There is a `.env` file for managing connection details. The project was built to teach myself the basics of a golang API
 
 # **ORGANIZATION**
 The project hierarchy:
